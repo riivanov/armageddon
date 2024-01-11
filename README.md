@@ -4,4 +4,6 @@ To run the API:
 
 `npm start`
 
-this assumes you have NPM and Node. If not download [NVM](https://github.com/nvm-sh/nvm).
+This assumes you have NPM and Node installed.
+
+- If not download [NVM](https://github.com/nvm-sh/nvm).
