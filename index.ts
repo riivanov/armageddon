@@ -71,7 +71,7 @@ interface NASAResponse {
     prevoius: string;
     self: string;
   };
-  near_earth_objects: Array<NEO>;
+  near_earth_objects: NEO;
 }
 
 //  https://api.nasa.gov/neo/rest/v1/feed?start_date=START_DATE&end_date=END_DATE&api_key=API_KEY
@@ -83,21 +83,22 @@ app.get("/", async (req, res) => {
   url.search = querystring.encode(queryParams);
 
   const { data } = await axios.get<NASAResponse>(url.href);
-  const near_earth_objects = data.near_earth_objects as Array<NEO>;
-  // const { near_earth_objects } = data;
+  const near_earth_objects = data.near_earth_objects as NEO;
 
-  // near_earth_objects.forEach((day) => {
-  //   day['abc'].
-  // });
+  const keys = Object.keys(near_earth_objects).sort();
 
-  // console.log(near_earth_objects);
+  keys.forEach((day) => {
+    near_earth_objects[day].forEach((asteroid) => {
+      const miss_distance =
+        asteroid.close_approach_data[0].miss_distance.kilometers;
+      console.log(miss_distance);
+      // console.log(asteroid.name);
+    });
+  });
+
   res.send(data);
 });
 
 app.listen(port, () => {
   console.log(`[server]: server is running at http://localhost:${port}`);
 });
-
-// function filterAsteroids() {
-
-// }
