@@ -5,7 +5,7 @@ import { DateTime } from "luxon";
 import querystring from "node:querystring";
 import { URL } from "node:url";
 import { errorHandler } from "./middleware/error-handler";
-import { Asteroid, NASAResponse, NEO } from "./nasa-response.interface";
+import { NASAResponse, NEO } from "./nasa-response.interface";
 import { tryCatch } from "./utils/try-catch";
 
 const app = express();
@@ -31,8 +31,6 @@ app.post(
     if (!maxAsteroidRange || maxAsteroidRange < 0)
       throw new Error(`within->value must be > 0`);
 
-    console.log(maxAsteroidRange);
-
     const start = DateTime.fromFormat(dateStart, `yyyy-MM-dd`);
     const end = DateTime.fromFormat(dateEnd, `yyyy-MM-dd`);
     // if not valid format
@@ -54,19 +52,21 @@ app.post(
 
     const keys = Object.keys(near_earth_objects).sort();
 
-    let dangerous: Asteroid[] = [];
+    let dangerous: string[] = [];
     for (const day of keys) {
       dangerous.push(
-        ...near_earth_objects[day].filter((asteroid) => {
-          const miss_distance =
-            asteroid.close_approach_data[0].miss_distance.kilometers;
+        ...near_earth_objects[day]
+          .filter((asteroid) => {
+            const miss_distance =
+              asteroid.close_approach_data[0].miss_distance.kilometers;
 
-          return Number(miss_distance) <= maxAsteroidRange;
-        })
+            return Number(miss_distance) <= maxAsteroidRange;
+          })
+          .map((asteroid) => asteroid.name)
       );
     }
 
-    res.json(dangerous);
+    res.json({ asteroids: dangerous });
   })
 );
 

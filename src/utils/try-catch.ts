@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import express, { NextFunction } from "express";
 
 export const tryCatch =
@@ -6,6 +7,11 @@ export const tryCatch =
     try {
       await controller(req, res);
     } catch (error) {
+      if (error instanceof AxiosError) {
+        error.status = error.response?.data.code;
+        error.message = error.response?.data.error_message;
+      }
+
       return next(error);
     }
   };
