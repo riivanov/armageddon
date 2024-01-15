@@ -6,6 +6,7 @@ import { URL } from "node:url";
 import { Asteroid, NASAResponse, NEO } from "./nasa-response.interface";
 
 const app = express();
+app.use(express.json());
 dotenv.config();
 const port = process.env.PORT;
 
@@ -17,6 +18,10 @@ const mockReq = {
     units: "kilometers",
   },
 };
+
+app.post(`/`, async (req, res) => {
+  res.json(req.body);
+});
 
 //  https://api.nasa.gov/neo/rest/v1/feed?start_date=START_DATE&end_date=END_DATE&api_key=API_KEY
 app.get("/", async (req, res) => {

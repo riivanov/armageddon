@@ -1,0 +1,8 @@
+{
+  "dateStart": "2019-01-01",
+  "dateEnd": "2019-01-07",
+  "within": {
+    "value": 9000000,
+    "units": "kilometers"
+  }
+}
