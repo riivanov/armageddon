@@ -4,6 +4,8 @@ This assumes you have NPM and Node installed.
 
 - If not download [NVM](https://github.com/nvm-sh/nvm).
 
+As a conveniece the Linux commands for installing NVM/Node are provided. If you're using another OS please see the link above.
+
 ```
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 nvm install --lts
@@ -30,3 +32,5 @@ To test the endpoint, from the project directory, you can use `curl`:
 ```
 curl --json @post.json -X POST http://localhost:7891/
 ```
+
+If you don't have `curl`, for example if you're on Windows, try [Postman](https://www.postman.com/downloads/)
