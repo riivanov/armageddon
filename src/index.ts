@@ -4,7 +4,9 @@ import express from "express";
 import { DateTime } from "luxon";
 import querystring from "node:querystring";
 import { URL } from "node:url";
+import { errorHandler } from "./middleware/error-handler";
 import { Asteroid, NASAResponse, NEO } from "./nasa-response.interface";
+import { tryCatch } from "./utils/try-catch";
 
 const app = express();
 app.use(express.json());
@@ -20,26 +22,29 @@ const mockReq = {
   },
 };
 
-app.post(`/`, async (req, res) => {
-  const { body } = req;
-  // if no body
-  if (!body) res.status(400).send(`POST request without a body`);
+app.post(
+  `/`,
+  tryCatch(async (req: any, res: any) => {
+    const { body } = req;
+    // if no body
+    if (!body) throw new Error(`POST request without a body`);
 
-  const { dateStart, dateEnd } = body;
-  // if no start/end
-  if (!dateStart) res.status(400).send(`dateStart is a required field`);
-  if (!dateEnd) res.status(400).send(`dateEnd is a required field`);
+    const { dateStart, dateEnd } = body;
+    // if no start/end
+    if (!dateStart) throw new Error(`dateStart is a required field`);
+    if (!dateEnd) throw new Error(`dateEnd is a required field`);
 
-  const start = DateTime.fromFormat(dateStart, `yyyy-MM-dd`);
-  const end = DateTime.fromFormat(dateEnd, `yyyy-MM-dd`);
-  // if not valid format
-  if (!start.isValid)
-    res.status(400).send(`Start Date Invalid ${start.invalidExplanation}`);
-  if (!end.isValid)
-    res.status(400).send(`End Date Invalid ${end.invalidExplanation}`);
+    const start = DateTime.fromFormat(dateStart, `yyyy-MM-dd`);
+    const end = DateTime.fromFormat(dateEnd, `yyyy-MM-dd`);
+    // if not valid format
+    if (!start.isValid)
+      throw new Error(`Start Date Invalid ${start.invalidExplanation}`);
+    if (!end.isValid)
+      throw new Error(`End Date Invalid ${end.invalidExplanation}`);
 
-  res.json(body);
-});
+    res.json(body);
+  })
+);
 
 //  https://api.nasa.gov/neo/rest/v1/feed?start_date=START_DATE&end_date=END_DATE&api_key=API_KEY
 app.get("/", async (req, res) => {
@@ -68,6 +73,8 @@ app.get("/", async (req, res) => {
 
   res.send(dangerous);
 });
+
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`[server]: server is running at http://localhost:${port}`);
