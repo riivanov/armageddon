@@ -1,6 +1,7 @@
 import axios from "axios";
 import dotenv from "dotenv";
 import express from "express";
+import { DateTime } from "luxon";
 import querystring from "node:querystring";
 import { URL } from "node:url";
 import { Asteroid, NASAResponse, NEO } from "./nasa-response.interface";
@@ -20,7 +21,24 @@ const mockReq = {
 };
 
 app.post(`/`, async (req, res) => {
-  res.json(req.body);
+  const { body } = req;
+  // if no body
+  if (!body) res.status(400).send(`POST request without a body`);
+
+  const { dateStart, dateEnd } = body;
+  // if no start/end
+  if (!dateStart) res.status(400).send(`dateStart is a required field`);
+  if (!dateEnd) res.status(400).send(`dateEnd is a required field`);
+
+  const start = DateTime.fromFormat(dateStart, `yyyy-MM-dd`);
+  const end = DateTime.fromFormat(dateEnd, `yyyy-MM-dd`);
+  // if not valid format
+  if (!start.isValid)
+    res.status(400).send(`Start Date Invalid ${start.invalidExplanation}`);
+  if (!end.isValid)
+    res.status(400).send(`End Date Invalid ${end.invalidExplanation}`);
+
+  res.json(body);
 });
 
 //  https://api.nasa.gov/neo/rest/v1/feed?start_date=START_DATE&end_date=END_DATE&api_key=API_KEY
